@@ -28,6 +28,7 @@ public class MessageBusImplTest {
     public void subscribeEvent() {
     }
 
+    //we c
     @Test
     public void subscribeBroadcast() {
     }
@@ -39,11 +40,11 @@ public class MessageBusImplTest {
         MicroService m2=new TestMicroService();
         messagebus.register(m1);
         messagebus.register(m2);
-//        messagebus.subscribeEvent(testEvent.class,m1);
         messagebus.subscribeEvent(testEvent.class,m2);
         Future<Integer> f=m1.sendEvent(e);
-        Message msg=messagebus.awaitMessage(m2);
-        m2.complete((Event<Integer>)msg,2);
+        testEvent msg=(testEvent) messagebus.awaitMessage(m2);
+        messagebus.complete(msg,2);
+        assertNotNull(f);
         int result=f.get();
         assertEquals(2,result);
 
@@ -51,33 +52,33 @@ public class MessageBusImplTest {
 
     @Test
     public void sendBroadcast() throws InterruptedException {
-        Broadcast e = new testBroadcast(2);
+        testBroadcast e = new testBroadcast(2);
         TestMicroService m1 = new TestMicroService();
         TestMicroService m2 = new TestMicroService();
         TestMicroService m3=new TestMicroService();
         messagebus.register(m1);
         messagebus.register(m2);
         messagebus.register(m3);
-        m2.subscribeBroadcast(testBroadcast.class,null);
-        m3.subscribeBroadcast(testBroadcast.class,null);
+        messagebus.subscribeBroadcast(testBroadcast.class,m2);
+        messagebus.subscribeBroadcast(testBroadcast.class,m3);
         m1.sendBroadcast(e);
-        Message msg1=messagebus.awaitMessage(m2);
-        Message msg2=messagebus.awaitMessage(m3);
+        testBroadcast msg1=(testBroadcast) messagebus.awaitMessage(m2);
+        testBroadcast msg2=(testBroadcast) messagebus.awaitMessage(m3);
         assertEquals(e,msg1);
         assertEquals(e,msg2);
     }
 
     @Test
     public void sendEvent() throws InterruptedException {
-        Event<Integer> e = new testEvent(2);
+        testEvent e = new testEvent(2);
         TestMicroService m1 = new TestMicroService();
         TestMicroService m2 = new TestMicroService();
         messagebus.register(m1);
         messagebus.register(m2);
-        m2.subscribeEvent(testEvent.class,null);
+        messagebus.subscribeEvent(testEvent.class,m2);
         Future<Integer> f = m1.sendEvent(e);
-        Message msg = messagebus.awaitMessage(m2);
-        assertEquals((Event<Integer>) msg,e);
+        testEvent msg =(testEvent) messagebus.awaitMessage(m2);
+        assertEquals(msg,e);
     }
 
     @Test
@@ -90,14 +91,18 @@ public class MessageBusImplTest {
 
     @Test
     public void awaitMessage() throws InterruptedException {
-        Event<Integer> e = new testEvent(2);
+        testEvent e = new testEvent(2);
         TestMicroService m1 = new TestMicroService();
         TestMicroService m2 = new TestMicroService();
         messagebus.register(m1);
         messagebus.register(m2);
+        testEvent msg=null;
         m2.subscribeEvent(testEvent.class,null);
-        m1.sendEvent(e);
-        Message msg = messagebus.awaitMessage(m2);
+        try{
+            m1.sendEvent(e);
+            msg =(testEvent) messagebus.awaitMessage(m2);
+        }
+        catch (InterruptedException ex){}
         assertEquals(msg, e);
     }
 }

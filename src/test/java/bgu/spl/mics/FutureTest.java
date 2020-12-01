@@ -23,8 +23,8 @@ public class FutureTest {
     @Test
     public void get() {
         assertFalse(future.isDone());
-        future.resolve("");
-        future.get();
+        future.resolve("foo");
+        assertEquals(future.get(),"foo");
         assertTrue(future.isDone());
 
     }
@@ -52,5 +52,6 @@ public class FutureTest {
         assertFalse(future.isDone());
         future.resolve("foo");
         assertEquals(future.get(100,TimeUnit.MILLISECONDS),"foo");
+        assertTrue(future.isDone());
     }
 }
