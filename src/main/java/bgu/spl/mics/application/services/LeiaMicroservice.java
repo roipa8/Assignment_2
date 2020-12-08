@@ -3,6 +3,8 @@ package bgu.spl.mics.application.services;
 import java.util.ArrayList;
 import java.util.List;
 
+import bgu.spl.mics.Event;
+import bgu.spl.mics.Future;
 import bgu.spl.mics.MicroService;
 import bgu.spl.mics.application.passiveObjects.Attack;
 
@@ -16,6 +18,8 @@ import bgu.spl.mics.application.passiveObjects.Attack;
  */
 public class LeiaMicroservice extends MicroService {
 	private Attack[] attacks;
+    Runnable leia=new LeiaMicroservice(attacks);
+    Thread tLeia=new Thread(leia);
 	
     public LeiaMicroservice(Attack[] attacks) {
         super("Leia");
@@ -24,6 +28,8 @@ public class LeiaMicroservice extends MicroService {
 
     @Override
     protected void initialize() {
-    	
+
     }
+
+
 }
