@@ -16,8 +16,10 @@ import java.util.concurrent.LinkedBlockingQueue;
  * Only private fields and methods can be added to this class.
  */
 public class MessageBusImpl implements MessageBus {
-	private HashMap<String, LinkedBlockingQueue> HMQueue;
+	private HashMap<String, LinkedBlockingQueue<Message>> HMQueue;
 	private HashMap<Class<? extends Message>, LinkedList<String>> HMType;
+	private HashMap<Class<? extends Event>, Future> HMFuture;
+
 
 
 	private static class SingletonHolder{
@@ -27,6 +29,7 @@ public class MessageBusImpl implements MessageBus {
 	private MessageBusImpl(){
 		HMQueue=new HashMap<>();
 		HMType=new HashMap<>();
+		HMFuture=new HashMap<>();
 	}
 
 	public static MessageBusImpl getInstance(){
@@ -64,19 +67,31 @@ public class MessageBusImpl implements MessageBus {
 
 	@Override
 	public <T> void complete(Event<T> e, T result) {
-
+		Future f=HMFuture.get(e);
+		f.resolve(result);
 	}
 
 	@Override
 	public void sendBroadcast(Broadcast b) {
-		
+		LinkedList<String> list=HMType.get(b);
+		for(String s: list){
+			LinkedBlockingQueue <Message> queue=HMQueue.get(s);
+			queue.add(b);
+		}
 	}
 
 	
 	@Override
 	public <T> Future<T> sendEvent(Event<T> e) {
-		Future<T> future;
-        return null;
+		LinkedList<String> list = HMType.get(e);
+		String temp=list.get(0);
+		list.removeFirst();
+		LinkedBlockingQueue queue=HMQueue.get(temp);
+		queue.add(e);
+		list.addLast(temp);
+		Future<T> future=new Future<>();
+		HMFuture.put(e.getClass(),future);
+        return future;
 	}
 
 	@Override
@@ -92,6 +107,8 @@ public class MessageBusImpl implements MessageBus {
 
 	@Override
 	public Message awaitMessage(MicroService m) throws InterruptedException {
-		return null;
+		LinkedBlockingQueue<Message> q = HMQueue.get(m);
+		Message msg = q.remove();
+		return msg;
 	}
 }

@@ -16,7 +16,8 @@ public class Ewoks {
     private static class SingletonHolder{
         private static Ewoks instance =new Ewoks();
     }
-    private Ewoks(){}
+    private Ewoks(){
+    }
     public void initialize(int ewoksSize){
         EwoksArr=new Ewok[ewoksSize];
         for(int i=0; i<ewoksSize; i++){
@@ -25,6 +26,12 @@ public class Ewoks {
     }
     public Ewok[] getEwoksArr(){
         return EwoksArr;
+    }
+    public boolean isAvailable(Ewok ewok){
+        return ewok.available;
+    }
+    public int getSerialNumber(Ewok ewok){
+        return ewok.serialNumber;
     }
     public static Ewoks getInstance(){
         return SingletonHolder.instance;

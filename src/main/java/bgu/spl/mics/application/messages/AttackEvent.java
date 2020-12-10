@@ -11,5 +11,11 @@ public class AttackEvent implements Event<Boolean> {
 	    this.duration = duration;
 	    this.serial = serial;
     }
+	public int getDuration() {
+		return duration;
+	}
+	public List<Integer> getSerials(){
+		return serial;
+	}
 
 }

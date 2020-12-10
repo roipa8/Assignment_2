@@ -24,4 +24,7 @@ public class Diary {
     public static Diary getInstance(){
         return SingletonHolder.instance;
     }
+    public void setR2D2Deactivate(long R2D2Deactivate){
+        this.R2D2Deactivate=R2D2Deactivate;
+    }
 }

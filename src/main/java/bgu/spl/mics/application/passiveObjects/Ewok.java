@@ -21,6 +21,10 @@ public class Ewok {
         available=false;
     }
 
+    public boolean isAvailable(){
+        return available;
+    }
+
     /**
      * release an Ewok
      */

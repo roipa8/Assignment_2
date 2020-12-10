@@ -22,37 +22,37 @@ public class Main {
 		try{
 			String input="C:/Studies/Semester3/SPL/Assignment2/src/main/java/bgu/spl/mics/application/input.json";
 			Input json = JsonInputReader.getInputFromJson(input);
-			HashMap<Class<? extends Message>, LinkedList<String>> HMType=new HashMap<>();
-			LinkedList<String> list=new LinkedList<>();
-			AttackEvent a=new AttackEvent(json.getAttacks()[0].getDuration(),json.getAttacks()[0].getSerials());
-			HMType.put(a.getClass(),list);
-			System.out.println(HMType);
-			LinkedList<String> Llist=HMType.get(AttackEvent.class);
-			Llist.add("Han");
-			System.out.println(HMType);
-			Llist.add("C3PO");
-			System.out.println(HMType);
+			C3POMicroservice c3POMicroservice=new C3POMicroservice();
 			Ewoks ewoks=Ewoks.getInstance();
 			ewoks.initialize(json.getEwoks());
+			System.out.println(json.getAttacks()[0].getSerials().get(0));
+			AttackEvent event = new AttackEvent(1000,json.getAttacks()[0].getSerials());
+			Ewok[] ewok=ewoks.getEwoksArr();
+			for(int i=0; i<event.getSerials().size(); i++){
+//                while (!ewoks1[event.getSerials().get(i)]){
+//
+//                }
+
+			}
 ////			System.out.println(json);
 //			Ewoks ewoks=new Ewoks(json.getEwoks());
 //			Diary diary=new Diary();
 //			C3POMicroservice m=new C3POMicroservice();
 //			System.out.println(m.getName());
 //			System.out.println(json.getEwoks());
-//			Runnable leia=new LeiaMicroservice(json.getAttacks());
-//			Thread tLeia=new Thread(leia);
+			Runnable leia=new LeiaMicroservice(json.getAttacks());
+			Thread tLeia=new Thread(leia);
 //			Runnable hanSolo=new HanSoloMicroservice();
 //			Thread tHanSolo=new Thread(hanSolo);
-//			Runnable c3po=new C3POMicroservice();
-//			Thread tC3po=new Thread(c3po);
+			Runnable c3po=new C3POMicroservice();
+			Thread tC3po=new Thread(c3po);
 //			Runnable r2d2=new R2D2Microservice(json.getR2D2());
 //			Thread tR2d2=new Thread(r2d2);
 //			Runnable lando=new LandoMicroservice(json.getLando());
 //			Thread tLando=new Thread(lando);
-//			tLeia.start();
+			tLeia.start();
 //			tHanSolo.start();
-//			tC3po.start();
+			tC3po.start();
 //			tR2d2.start();
 //			tLando.start();
 		}

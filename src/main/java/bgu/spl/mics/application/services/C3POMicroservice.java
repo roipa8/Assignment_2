@@ -4,6 +4,7 @@ import bgu.spl.mics.Callback;
 import bgu.spl.mics.Message;
 import bgu.spl.mics.MicroService;
 import bgu.spl.mics.application.messages.AttackEvent;
+import bgu.spl.mics.application.passiveObjects.Ewok;
 import bgu.spl.mics.application.passiveObjects.Ewoks;
 import org.w3c.dom.events.Event;
 
@@ -28,9 +29,27 @@ public class C3POMicroservice extends MicroService {
     @Override
     protected void initialize() {
         register(this);
-        subscribeEvent(AttackEvent.class, (c)->{
+        subscribeEvent(AttackEvent.class, (AttackEvent event)->{
             Ewoks ewoks=Ewoks.getInstance();
+            Ewok[] ewoks1=ewoks.getEwoksArr();
+            int count=0;
+            for(int i=0; i<event.getSerials().size(); i++){
+//                while (!ewoks1[event.getSerials().get(i)]){
+//
+//                }
+                while(!ewoks.getEwoksArr()[event.getSerials().get(i)].isAvailable()){
+//                    wait();
+                }
+
+            }
+            notifyAll();
+            try{
+                Thread.sleep(event.getDuration());
+            }
+            catch (InterruptedException e){}
         });
+        run();
+
     }
 
 

@@ -23,6 +23,7 @@ public class HanSoloMicroservice extends MicroService {
     protected void initialize() {
         register(this);
         subscribeEvent(AttackEvent.class, null);
+        run();
     }
 
 

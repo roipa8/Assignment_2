@@ -34,9 +34,8 @@ public class LeiaMicroservice extends MicroService {
         register(this);
         for (int i = 0; i < attacks.length; i++) {
             AttackEvent attackEvent = new AttackEvent(attacks[i].getDuration(), attacks[i].getSerials());
-            Future<?> f = sendEvent(attackEvent);
+            Future f = sendEvent(attackEvent);
             f.get();
-
         }
 
 

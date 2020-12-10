@@ -28,6 +28,7 @@ import java.util.HashMap;
 public abstract class MicroService implements Runnable {
     private String name;
     private HashMap<Class<? extends Message>,Callback> h;
+    private boolean shouldStop=false;
 
 
 
@@ -89,6 +90,7 @@ public abstract class MicroService implements Runnable {
      *                 queue.
      */
     protected final <B extends Broadcast> void subscribeBroadcast(Class<B> type, Callback<B> callback) {
+        h.put(type,callback);
     	MessageBusImpl bus=MessageBusImpl.getInstance();
     	bus.subscribeBroadcast(type,this);
     }
@@ -106,7 +108,7 @@ public abstract class MicroService implements Runnable {
      * 	       			null in case no micro-service has subscribed to {@code e.getClass()}.
      */
     protected final <T> Future<T> sendEvent(Event<T> e) {
-        return null; 
+        return MessageBusImpl.getInstance().sendEvent(e);
     }
 
     /**
@@ -116,7 +118,8 @@ public abstract class MicroService implements Runnable {
      * @param b The broadcast message to send
      */
     protected final void sendBroadcast(Broadcast b) {
-    	
+        MessageBusImpl bus=MessageBusImpl.getInstance();
+        bus.sendBroadcast(b);
     }
 
 
@@ -145,7 +148,7 @@ public abstract class MicroService implements Runnable {
      * message.
      */
     protected final void terminate() {
-    	
+    	shouldStop=true;
     }
 
     /**
@@ -162,15 +165,17 @@ public abstract class MicroService implements Runnable {
      */
     @Override
     public final void run() {
-        Message msg =null;
-        MessageBusImpl messageBus=MessageBusImpl.getInstance();
-        try {
-            msg=messageBus.awaitMessage(this);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        while(!shouldStop){
+            Message msg =null;
+            MessageBusImpl messageBus=MessageBusImpl.getInstance();
+            try {
+                msg=messageBus.awaitMessage(this);
+            } catch (InterruptedException e) {
+//                e.printStackTrace();
+            }
+            Callback c=h.get(msg);
+            c.call(msg);
         }
-        Callback c=h.get(msg);
-        c.call(msg);
     }
     protected void register(MicroService m) {
         MessageBusImpl bus=MessageBusImpl.getInstance();
