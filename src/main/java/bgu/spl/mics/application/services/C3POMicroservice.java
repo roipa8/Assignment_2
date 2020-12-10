@@ -1,9 +1,13 @@
 package bgu.spl.mics.application.services;
 
-import bgu.spl.mics.Event;
+import bgu.spl.mics.Callback;
+import bgu.spl.mics.Message;
 import bgu.spl.mics.MicroService;
 import bgu.spl.mics.application.messages.AttackEvent;
+import bgu.spl.mics.application.passiveObjects.Ewoks;
+import org.w3c.dom.events.Event;
 
+import java.util.HashMap;
 import java.util.Queue;
 
 
@@ -16,18 +20,20 @@ import java.util.Queue;
 // * You MAY change constructor signatures and even add new public constructors.
 // */
 public class C3POMicroservice extends MicroService {
-    Runnable c3po=new C3POMicroservice();
-    Thread tC3po=new Thread(c3po);
-    Queue q;
     public C3POMicroservice() {
         super("C3PO");
     }
 
+
     @Override
     protected void initialize() {
-        subscribeEvent(AttackEvent.class,null);
+        register(this);
+        subscribeEvent(AttackEvent.class, (c)->{
+            Ewoks ewoks=Ewoks.getInstance();
+        });
     }
-    public Queue getQueue(){
-        return q;
-    }
+
+
 }
+
+

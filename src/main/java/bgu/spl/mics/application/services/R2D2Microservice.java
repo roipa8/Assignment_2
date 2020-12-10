@@ -9,7 +9,7 @@ import bgu.spl.mics.MicroService;
  *
  * You can add private fields and public methods to this class.
  * You MAY change constructor signatures and even add new public constructors.
- */
+ **/
 public class R2D2Microservice extends MicroService {
 
     public R2D2Microservice(long duration) {
@@ -18,5 +18,7 @@ public class R2D2Microservice extends MicroService {
 
     @Override
     protected void initialize() {
+        register(this);
+
     }
 }

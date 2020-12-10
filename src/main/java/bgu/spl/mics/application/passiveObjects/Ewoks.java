@@ -13,10 +13,11 @@ package bgu.spl.mics.application.passiveObjects;
 public class Ewoks {
     private Ewok[] EwoksArr;
     private static Ewoks instance = null;
-//    private static class SingletonHolder{
-//        private static Ewoks instance =new Ewoks();
-//    }
-    public Ewoks(int ewoksSize){
+    private static class SingletonHolder{
+        private static Ewoks instance =new Ewoks();
+    }
+    private Ewoks(){}
+    public void initialize(int ewoksSize){
         EwoksArr=new Ewok[ewoksSize];
         for(int i=0; i<ewoksSize; i++){
             EwoksArr[i]=new Ewok(i+1,true);
@@ -25,8 +26,8 @@ public class Ewoks {
     public Ewok[] getEwoksArr(){
         return EwoksArr;
     }
-//    public static Ewoks getInstance(){
-//        return SingletonHolder.instance;
-//    }
+    public static Ewoks getInstance(){
+        return SingletonHolder.instance;
+    }
 
 }

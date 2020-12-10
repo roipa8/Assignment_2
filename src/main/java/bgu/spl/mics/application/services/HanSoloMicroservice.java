@@ -21,8 +21,8 @@ public class HanSoloMicroservice extends MicroService {
 
     @Override
     protected void initialize() {
-        run();
-        subscribeEvent(AttackEvent.class,null);
+        register(this);
+        subscribeEvent(AttackEvent.class, null);
     }
 
 

@@ -1,7 +1,7 @@
 package bgu.spl.mics;
 
 import bgu.spl.mics.application.messages.AttackEvent;
-import bgu.spl.mics.application.messages.testEvent;
+//import bgu.spl.mics.application.messages.testEvent;
 import bgu.spl.mics.application.messages.testBroadcast;
 import bgu.spl.mics.application.services.*;
 import org.junit.After;
