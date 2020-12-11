@@ -4,6 +4,8 @@ import bgu.spl.mics.Callback;
 import bgu.spl.mics.Message;
 import bgu.spl.mics.MicroService;
 import bgu.spl.mics.application.messages.AttackEvent;
+import bgu.spl.mics.application.messages.TerminationBroadcast;
+import bgu.spl.mics.application.passiveObjects.Diary;
 import bgu.spl.mics.application.passiveObjects.Ewok;
 import bgu.spl.mics.application.passiveObjects.Ewoks;
 import org.w3c.dom.events.Event;
@@ -28,31 +30,33 @@ public class C3POMicroservice extends MicroService {
 
     @Override
     protected void initialize() {
-        register(this);
-        subscribeEvent(AttackEvent.class, (AttackEvent event)->{
-            Ewoks ewoks=Ewoks.getInstance();
-            Ewok[] ewoks1=ewoks.getEwoksArr();
-            int count=0;
-            for(int i=0; i<event.getSerials().size(); i++){
-//                while (!ewoks1[event.getSerials().get(i)]){
-//
-//                }
-                while(!ewoks.getEwoksArr()[event.getSerials().get(i)].isAvailable()){
-//                    wait();
+//        register(this);
+        subscribeEvent(AttackEvent.class, (AttackEvent event) -> {
+            Ewoks ewoks = Ewoks.getInstance();
+            int count = 0;
+            for (int i = 0; i < event.getSerials().size(); i++) {
+                while (!ewoks.getEwoksArr()[event.getSerials().get(i)].isAvailable()) {
+                    wait();
+                    ewoks.getEwoksArr()[event.getSerials().get(i)].acquire();
                 }
+                try {
+                    Thread.sleep(event.getDuration());
+                } catch (InterruptedException e) {
+                }
+            }
+            complete(event, true);
 
+            for (int i = 0; i < event.getSerials().size(); i++) {
+                ewoks.getEwoksArr()[event.getSerials().get(i)].release();
             }
             notifyAll();
-            try{
-                Thread.sleep(event.getDuration());
-            }
-            catch (InterruptedException e){}
         });
-        run();
-
+        subscribeBroadcast(TerminationBroadcast.class,(TerminationBroadcast terminationBroadcast) -> {
+            terminate();
+            Diary diary=Diary.getInstance();
+            diary.setC3PoTerminate(System.currentTimeMillis());
+        });
     }
-
-
 }
 
 

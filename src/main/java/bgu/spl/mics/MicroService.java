@@ -27,7 +27,7 @@ import java.util.HashMap;
  */
 public abstract class MicroService implements Runnable {
     private String name;
-    private HashMap<Class<? extends Message>,Callback> h;
+    private HashMap<Class<? extends Message>,Callback> HMMsgCallback;
     private boolean shouldStop=false;
 
 
@@ -40,6 +40,7 @@ public abstract class MicroService implements Runnable {
      */
     public MicroService(String name) {
     	this.name=name;
+    	HMMsgCallback=new HashMap<>();
     }
 
     /**
@@ -64,7 +65,7 @@ public abstract class MicroService implements Runnable {
      *                 queue.
      */
     protected final <T, E extends Event<T>> void subscribeEvent(Class<E> type, Callback<E> callback) {
-        h.put(type,callback);
+        HMMsgCallback.put(type,callback);
     	MessageBusImpl bus=MessageBusImpl.getInstance();
     	bus.subscribeEvent(type,this);
     }
@@ -90,7 +91,7 @@ public abstract class MicroService implements Runnable {
      *                 queue.
      */
     protected final <B extends Broadcast> void subscribeBroadcast(Class<B> type, Callback<B> callback) {
-        h.put(type,callback);
+        HMMsgCallback.put(type,callback);
     	MessageBusImpl bus=MessageBusImpl.getInstance();
     	bus.subscribeBroadcast(type,this);
     }
@@ -141,7 +142,7 @@ public abstract class MicroService implements Runnable {
     /**
      * this method is called once when the event loop starts.
      */
-    protected abstract void initialize();
+    protected abstract void initialize() throws InterruptedException;
 
     /**
      * Signals the event loop that it must terminate after handling the current
@@ -165,22 +166,37 @@ public abstract class MicroService implements Runnable {
      */
     @Override
     public final void run() {
+        MessageBusImpl messageBus=MessageBusImpl.getInstance();
+        messageBus.register(this);
+        try {
+            initialize();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        Message msg =null;
         while(!shouldStop){
-            Message msg =null;
-            MessageBusImpl messageBus=MessageBusImpl.getInstance();
             try {
                 msg=messageBus.awaitMessage(this);
             } catch (InterruptedException e) {
 //                e.printStackTrace();
             }
-            Callback c=h.get(msg);
-            c.call(msg);
+            if(msg!=null){
+                if(HMMsgCallback.containsKey(msg)){
+                    Callback c=HMMsgCallback.get(msg);
+                    try {
+                        c.call(msg);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
         }
+//        messageBus.unregister(this);
     }
-    protected void register(MicroService m) {
-        MessageBusImpl bus=MessageBusImpl.getInstance();
-        bus.register(m);
-    }
+//    protected void register(MicroService m) {
+//        MessageBusImpl bus=MessageBusImpl.getInstance();
+//        bus.register(m);
+//    }
 
 
 }

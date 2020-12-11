@@ -67,48 +67,73 @@ public class MessageBusImpl implements MessageBus {
 
 	@Override
 	public <T> void complete(Event<T> e, T result) {
-		Future f=HMFuture.get(e);
-		f.resolve(result);
+		HMFuture.get(e).resolve(result);
+
 	}
 
 	@Override
 	public void sendBroadcast(Broadcast b) {
-		LinkedList<String> list=HMType.get(b);
-		for(String s: list){
-			LinkedBlockingQueue <Message> queue=HMQueue.get(s);
-			queue.add(b);
+		if(HMType.containsKey(b.getClass())){
+			if(HMType.get(b.getClass()).isEmpty()){
+				throw new NullPointerException("No micros-service has subscribed to "+b.getClass().getName());
+			}
+			LinkedList<String> list=HMType.get(b.getClass());
+			for(String s: list){
+				if(!HMQueue.containsKey(s)){
+					throw new NullPointerException("Micro-service "+s+" didn't register");
+				}
+				LinkedBlockingQueue <Message> queue=HMQueue.get(s);
+				queue.add(b);
+			}
 		}
+
 	}
 
 	
 	@Override
-	public <T> Future<T> sendEvent(Event<T> e) {
-		LinkedList<String> list = HMType.get(e);
-		String temp=list.get(0);
-		list.removeFirst();
-		LinkedBlockingQueue queue=HMQueue.get(temp);
-		queue.add(e);
-		list.addLast(temp);
+	public synchronized  <T> Future<T> sendEvent(Event<T> e) {
 		Future<T> future=new Future<>();
-		HMFuture.put(e.getClass(),future);
+		if(HMType.containsKey(e.getClass())){
+			if(HMType.get(e.getClass()).isEmpty()){
+				throw new NullPointerException("No micros-service has subscribed to "+e.getClass().getName());
+			}
+			LinkedList<String> list = HMType.get(e.getClass());
+			String temp=list.get(0);
+			list.removeFirst();
+			if(!HMQueue.containsKey(temp)){
+				throw new NullPointerException("Micro-service "+temp+" didn't register");
+			}
+//			HMQueue.putIfAbsent(temp,new LinkedBlockingQueue<>());
+			LinkedBlockingQueue <Message> queue=HMQueue.get(temp);
+			queue.add(e);
+			list.addLast(temp);
+			HMFuture.put(e.getClass(),future);
+			notifyAll();
+		}
         return future;
 	}
 
 	@Override
 	public void register(MicroService m) {
-		LinkedBlockingQueue q = new LinkedBlockingQueue();
+		LinkedBlockingQueue <Message> q = new LinkedBlockingQueue<>();
 		HMQueue.put(m.getName(),q);
 	}
 
 	@Override
 	public void unregister(MicroService m) {
-		
+		HMQueue.remove(m.getName());
 	}
 
 	@Override
-	public Message awaitMessage(MicroService m) throws InterruptedException {
-		LinkedBlockingQueue<Message> q = HMQueue.get(m);
-		Message msg = q.remove();
+	public synchronized Message awaitMessage(MicroService m) throws InterruptedException {
+		Message msg=null;
+		if(HMQueue.containsKey(m.getName())){
+			LinkedBlockingQueue<Message> q = HMQueue.get(m.getName());
+			while (q.isEmpty()){
+				wait();
+			}
+			msg=q.remove();
+		}
 		return msg;
 	}
 }

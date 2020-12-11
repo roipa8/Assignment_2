@@ -3,6 +3,8 @@ package bgu.spl.mics.application.services;
 
 import bgu.spl.mics.MicroService;
 import bgu.spl.mics.application.messages.AttackEvent;
+import bgu.spl.mics.application.messages.TerminationBroadcast;
+import bgu.spl.mics.application.passiveObjects.Diary;
 
 ///**
 // * HanSoloMicroservices is in charge of the handling {@link AttackEvents}.
@@ -21,10 +23,17 @@ public class HanSoloMicroservice extends MicroService {
 
     @Override
     protected void initialize() {
-        register(this);
-        subscribeEvent(AttackEvent.class, null);
-        run();
+//        register(this);
+        subscribeEvent(AttackEvent.class, (AttackEvent event)->{
+            complete(event,true);
+        });
+        subscribeBroadcast(TerminationBroadcast.class,(TerminationBroadcast terminationBroadcast) -> {
+            terminate();
+            Diary diary=Diary.getInstance();
+            diary.setHanSoloTerminate(System.currentTimeMillis());
+        });
     }
+
 
 
 

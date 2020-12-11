@@ -25,15 +25,15 @@ public class Main {
 			C3POMicroservice c3POMicroservice=new C3POMicroservice();
 			Ewoks ewoks=Ewoks.getInstance();
 			ewoks.initialize(json.getEwoks());
-			System.out.println(json.getAttacks()[0].getSerials().get(0));
-			AttackEvent event = new AttackEvent(1000,json.getAttacks()[0].getSerials());
-			Ewok[] ewok=ewoks.getEwoksArr();
-			for(int i=0; i<event.getSerials().size(); i++){
+//			System.out.println(json.getAttacks()[0].getSerials().get(0));
+//			AttackEvent event = new AttackEvent(1000,json.getAttacks()[0].getSerials());
+//			Ewok[] ewok=ewoks.getEwoksArr();
+//			for(int i=0; i<event.getSerials().size(); i++){
 //                while (!ewoks1[event.getSerials().get(i)]){
 //
 //                }
 
-			}
+//			}
 ////			System.out.println(json);
 //			Ewoks ewoks=new Ewoks(json.getEwoks());
 //			Diary diary=new Diary();
@@ -42,14 +42,14 @@ public class Main {
 //			System.out.println(json.getEwoks());
 			Runnable leia=new LeiaMicroservice(json.getAttacks());
 			Thread tLeia=new Thread(leia);
-//			Runnable hanSolo=new HanSoloMicroservice();
-//			Thread tHanSolo=new Thread(hanSolo);
+			Runnable hanSolo=new HanSoloMicroservice();
+			Thread tHanSolo=new Thread(hanSolo);
 			Runnable c3po=new C3POMicroservice();
 			Thread tC3po=new Thread(c3po);
-//			Runnable r2d2=new R2D2Microservice(json.getR2D2());
-//			Thread tR2d2=new Thread(r2d2);
-//			Runnable lando=new LandoMicroservice(json.getLando());
-//			Thread tLando=new Thread(lando);
+			Runnable r2d2=new R2D2Microservice(json.getR2D2());
+			Thread tR2d2=new Thread(r2d2);
+			Runnable lando=new LandoMicroservice(json.getLando());
+			Thread tLando=new Thread(lando);
 			tLeia.start();
 //			tHanSolo.start();
 			tC3po.start();

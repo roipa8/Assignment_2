@@ -1,6 +1,8 @@
 package bgu.spl.mics.application.passiveObjects;
 
 
+import java.util.List;
+
 /**
  * Passive object representing the resource manager.
  * <p>
@@ -26,6 +28,11 @@ public class Ewoks {
     }
     public Ewok[] getEwoksArr(){
         return EwoksArr;
+    }
+    public synchronized void getResources(List<Integer> list){
+        if(Thread.currentThread().getName().charAt(0)<1){
+
+        }
     }
     public boolean isAvailable(Ewok ewok){
         return ewok.available;

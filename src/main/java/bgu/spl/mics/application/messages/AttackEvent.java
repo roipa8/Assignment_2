@@ -17,5 +17,4 @@ public class AttackEvent implements Event<Boolean> {
 	public List<Integer> getSerials(){
 		return serial;
 	}
-
 }

@@ -27,4 +27,34 @@ public class Diary {
     public void setR2D2Deactivate(long R2D2Deactivate){
         this.R2D2Deactivate=R2D2Deactivate;
     }
+    public void setC3POFinish(long c3POFinish) {
+        C3POFinish = c3POFinish;
+    }
+    public void setHanSoloFinish(long hanSoloFinish) {
+        HanSoloFinish = hanSoloFinish;
+    }
+
+    public void setC3PoTerminate(long c3PoTerminate) {
+        C3PoTerminate = c3PoTerminate;
+    }
+
+    public void setHanSoloTerminate(long hanSoloTerminate) {
+        HanSoloTerminate = hanSoloTerminate;
+    }
+
+    public void setLandoTerminate(long landoTerminate) {
+        LandoTerminate = landoTerminate;
+    }
+
+    public void setLeiaTerminate(long leiaTerminate) {
+        LeiaTerminate = leiaTerminate;
+    }
+
+    public void setR2D2Terminate(long r2D2Terminate) {
+        R2D2Terminate = r2D2Terminate;
+    }
+
+    public void setTotalAttacks(int totalAttacks) {
+        this.totalAttacks = totalAttacks;
+    }
 }
