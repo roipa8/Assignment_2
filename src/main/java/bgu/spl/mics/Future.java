@@ -30,21 +30,23 @@ public class Future<T> {
      * 	       
      */
 	public synchronized T get() {
-		try{
-			while(!isDone){
-				this.wait();
+		while (!isDone()) {
+			try {
+				wait();
+			} catch (InterruptedException e) {
 			}
-		} catch (InterruptedException e) {}
+		}
 		return result;
 	}
 	
 	/**
      * Resolves the result of this Future object.
      */
-	public void resolve (T result) {
+	public synchronized void resolve (T result) {
 		this.result=result;
 		isDone=true;
 		notifyAll();
+
 	}
 	
 	/**

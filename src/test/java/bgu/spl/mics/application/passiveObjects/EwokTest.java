@@ -20,7 +20,7 @@ public class EwokTest {
     }
 
     @org.junit.Test
-    public void acquire() {
+    public void acquire() throws InterruptedException {
         ewok.acquire();
         assertFalse(ewok.available);
     }

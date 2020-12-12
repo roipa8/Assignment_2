@@ -17,7 +17,12 @@ public class Ewok {
     /**
      * Acquires an Ewok
      */
-    public void acquire() {
+    public synchronized void acquire() throws InterruptedException {
+        while (!isAvailable()){
+            try{
+                wait();
+            } catch (InterruptedException e){}
+        }
         available=false;
     }
 
@@ -28,7 +33,8 @@ public class Ewok {
     /**
      * release an Ewok
      */
-    public void release() {
+    public synchronized void release() {
+        notifyAll();
         available=true;
     }
 }

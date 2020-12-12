@@ -5,6 +5,7 @@ import bgu.spl.mics.MicroService;
 import bgu.spl.mics.application.messages.AttackEvent;
 import bgu.spl.mics.application.messages.TerminationBroadcast;
 import bgu.spl.mics.application.passiveObjects.Diary;
+import bgu.spl.mics.application.passiveObjects.Ewoks;
 
 ///**
 // * HanSoloMicroservices is in charge of the handling {@link AttackEvents}.
@@ -25,12 +26,19 @@ public class HanSoloMicroservice extends MicroService {
     protected void initialize() {
 //        register(this);
         subscribeEvent(AttackEvent.class, (AttackEvent event)->{
-            complete(event,true);
+            Ewoks ewoks = Ewoks.getInstance();
+            ewoks.getResources(event.getSerials());
+            Thread.sleep(event.getDuration());
+            complete(event, true);
+            Diary diary=Diary.getInstance();
+            diary.setHanSoloFinish(System.currentTimeMillis());
+            ewoks.releaseResources(event.getSerials());
         });
         subscribeBroadcast(TerminationBroadcast.class,(TerminationBroadcast terminationBroadcast) -> {
             terminate();
             Diary diary=Diary.getInstance();
             diary.setHanSoloTerminate(System.currentTimeMillis());
+            System.out.println("Han Solo Time:"+System.currentTimeMillis());
         });
     }
 

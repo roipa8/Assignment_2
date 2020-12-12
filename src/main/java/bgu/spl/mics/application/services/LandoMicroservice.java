@@ -19,8 +19,6 @@ public class LandoMicroservice  extends MicroService {
 
     @Override
     protected void initialize() {
-//        register(this);
-//        BombDestroyerEvent bombDestroyerEvent=new BombDestroyerEvent(duration);
         subscribeEvent(BombDestroyerEvent.class, (BombDestroyerEvent bombDestroyerEvent)->{
             try {
                 Thread.sleep(duration);
@@ -34,6 +32,7 @@ public class LandoMicroservice  extends MicroService {
             terminate();
             Diary diary=Diary.getInstance();
             diary.setLandoTerminate(System.currentTimeMillis());
+            System.out.println("Lando Time:"+System.currentTimeMillis());
         });
 
     }

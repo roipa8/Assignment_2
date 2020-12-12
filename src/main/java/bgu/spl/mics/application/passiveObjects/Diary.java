@@ -1,6 +1,8 @@
 package bgu.spl.mics.application.passiveObjects;
 
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * Passive data-object representing a Diary - in which the flow of the battle is recorded.
  * We are going to compare your recordings with the expected recordings, and make sure that your output makes sense.
@@ -8,7 +10,7 @@ package bgu.spl.mics.application.passiveObjects;
  * Do not add to this class nothing but a single constructor, getters and setters.
  */
 public class Diary {
-    private int totalAttacks;
+    private AtomicInteger totalAttacks;
     private long HanSoloFinish;
     private long C3POFinish;
     private long R2D2Deactivate;
@@ -17,6 +19,51 @@ public class Diary {
     private long C3PoTerminate;
     private long R2D2Terminate;
     private long LandoTerminate;
+
+    public AtomicInteger getTotalAttacks() {
+        return totalAttacks;
+    }
+
+    public void setTotalAttacks(AtomicInteger totalAttacks) {
+        this.totalAttacks = totalAttacks;
+    }
+
+    public long getC3POFinish() {
+        return C3POFinish;
+    }
+
+    public long getC3PoTerminate() {
+        return C3PoTerminate;
+    }
+
+    public long getHanSoloFinish() {
+        return HanSoloFinish;
+    }
+
+    public long getHanSoloTerminate() {
+        return HanSoloTerminate;
+    }
+
+    public long getLandoTerminate() {
+        return LandoTerminate;
+    }
+
+    public long getLeiaTerminate() {
+        return LeiaTerminate;
+    }
+
+    public long getR2D2Deactivate() {
+        return R2D2Deactivate;
+    }
+
+    public long getR2D2Terminate() {
+        return R2D2Terminate;
+    }
+
+    public void resetNumberAttacks() {
+        setTotalAttacks(new AtomicInteger(0));
+    }
+
     private static class SingletonHolder{
         private static Diary instance =new Diary();
     }
@@ -54,7 +101,5 @@ public class Diary {
         R2D2Terminate = r2D2Terminate;
     }
 
-    public void setTotalAttacks(int totalAttacks) {
-        this.totalAttacks = totalAttacks;
-    }
+
 }

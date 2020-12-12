@@ -1,7 +1,9 @@
 package bgu.spl.mics.application.passiveObjects;
 
 
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Passive object representing the resource manager.
@@ -14,11 +16,13 @@ import java.util.List;
 
 public class Ewoks {
     private Ewok[] EwoksArr;
+    private AtomicInteger count;
     private static Ewoks instance = null;
     private static class SingletonHolder{
         private static Ewoks instance =new Ewoks();
     }
     private Ewoks(){
+        count=new AtomicInteger();
     }
     public void initialize(int ewoksSize){
         EwoksArr=new Ewok[ewoksSize];
@@ -29,11 +33,30 @@ public class Ewoks {
     public Ewok[] getEwoksArr(){
         return EwoksArr;
     }
-    public synchronized void getResources(List<Integer> list){
-        if(Thread.currentThread().getName().charAt(0)<1){
 
+
+//    public synchronized void getResources(List<Integer> list){
+//
+//    }
+    public void getResources(List<Integer> list) throws InterruptedException {
+        Collections.sort(list);
+        for(int i = 0;i<list.size();i++){
+            EwoksArr[list.get(i)-1].acquire();
+            count.incrementAndGet();
         }
     }
+
+    public int getCount(){
+        return count.get();
+    }
+
+    public void releaseResources(List<Integer> list){
+        for(int i=0; i<list.size(); i++){
+            EwoksArr[list.get(i)-1].release();
+        }
+
+    }
+
     public boolean isAvailable(Ewok ewok){
         return ewok.available;
     }

@@ -23,7 +23,7 @@ public class R2D2Microservice extends MicroService {
     }
 
     @Override
-    protected void initialize() {
+    protected void initialize() throws InterruptedException {
 //        register(this);
 //        DeactivationEvent deactivationEvent=new DeactivationEvent(duration);
         subscribeEvent(DeactivationEvent.class, (DeactivationEvent deactivationEvent)->{
@@ -33,14 +33,16 @@ public class R2D2Microservice extends MicroService {
             }
             catch (InterruptedException e){
             }
+
             complete(deactivationEvent, true);
-            Diary diary=Diary.getInstance();
-            diary.setR2D2Deactivate(System.currentTimeMillis());
+//            Diary diary=Diary.getInstance();
+//            diary.setR2D2Deactivate(System.currentTimeMillis());
         });
         subscribeBroadcast(TerminationBroadcast.class,(TerminationBroadcast terminationBroadcast) -> {
             terminate();
             Diary diary=Diary.getInstance();
             diary.setR2D2Terminate(System.currentTimeMillis());
+            System.out.println("R2D2 Time:"+System.currentTimeMillis());
         });
 
     }
