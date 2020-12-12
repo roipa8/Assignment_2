@@ -17,6 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Ewoks {
     private Ewok[] EwoksArr;
     private AtomicInteger count;
+    private int TotalAttacks;
     private static Ewoks instance = null;
     private static class SingletonHolder{
         private static Ewoks instance =new Ewoks();
@@ -57,12 +58,20 @@ public class Ewoks {
 
     }
 
-    public boolean isAvailable(Ewok ewok){
-        return ewok.available;
+    public int getTotalAttacks() {
+        return TotalAttacks;
     }
-    public int getSerialNumber(Ewok ewok){
-        return ewok.serialNumber;
+
+    public void setTotalAttacks(int totalAttacks) {
+        TotalAttacks = totalAttacks;
     }
+
+    //    public boolean isAvailable(Ewok ewok){
+//        return ewok.available;
+//    }
+//    public int getSerialNumber(Ewok ewok){
+//        return ewok.serialNumber;
+//    }
     public static Ewoks getInstance(){
         return SingletonHolder.instance;
     }

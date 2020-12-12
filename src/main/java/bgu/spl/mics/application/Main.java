@@ -24,7 +24,7 @@ public class Main {
 		Diary diary=Diary.getInstance();
 		try{
 //			String input=args[0];
-			String input="C:/Studies/Semester3/SPL/Assignment2/src/main/java/bgu/spl/mics/application/input.json";
+			String input="C:/Studies/Semester3/SPL/Assignment2/src/main/java/bgu/spl/mics/application/Tests.json";
 //			String tests="C:/Studies/Semester3/SPL/Assignment2/Tests.json";
 			Input json = JsonInputReader.getInputFromJson(input);
 			Ewoks ewoks=Ewoks.getInstance();

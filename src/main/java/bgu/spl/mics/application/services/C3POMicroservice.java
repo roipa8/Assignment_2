@@ -30,32 +30,18 @@ public class C3POMicroservice extends MicroService {
 
     @Override
     protected void initialize() throws InterruptedException {
-//        register(this);
-//        Thread.sleep(20);
         subscribeEvent(AttackEvent.class, (AttackEvent event) -> {
             Ewoks ewoks = Ewoks.getInstance();
-//            int count = 0;
-//            for (int i = 0; i < event.getSerials().size(); i++) {
-//                while (!ewoks.getEwoksArr()[event.getSerials().get(i)].isAvailable()) {
-//                    wait();
-//                    ewoks.getEwoksArr()[event.getSerials().get(i)].acquire();
-//                }
-//                try {
-//                    Thread.sleep(event.getDuration());
-//                } catch (InterruptedException e) {
-//                }
-//            }
             ewoks.getResources(event.getSerials());
             Thread.sleep(event.getDuration());
             complete(event, true);
             Diary diary=Diary.getInstance();
             diary.setC3POFinish(System.currentTimeMillis());
             ewoks.releaseResources(event.getSerials());
-//
-//            for (int i = 0; i < event.getSerials().size(); i++) {
-//                ewoks.getEwoksArr()[event.getSerials().get(i)].release();
-//            }
-//            notifyAll();
+            if(ewoks.getCount()==ewoks.getTotalAttacks()){
+                diary.setTotalAttacks(ewoks.getCount());
+                System.out.println("total attacks ->"+ewoks.getCount());
+            }
         });
         subscribeBroadcast(TerminationBroadcast.class,(TerminationBroadcast terminationBroadcast) -> {
             terminate();

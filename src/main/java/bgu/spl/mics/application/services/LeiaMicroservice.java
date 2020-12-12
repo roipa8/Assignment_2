@@ -13,6 +13,7 @@ import bgu.spl.mics.application.messages.DeactivationEvent;
 import bgu.spl.mics.application.messages.TerminationBroadcast;
 import bgu.spl.mics.application.passiveObjects.Attack;
 import bgu.spl.mics.application.passiveObjects.Diary;
+import bgu.spl.mics.application.passiveObjects.Ewoks;
 
 /**
  * LeiaMicroservices Initialized with Attack objects, and sends them as  {@link AttackEvent}.
@@ -24,6 +25,7 @@ import bgu.spl.mics.application.passiveObjects.Diary;
  */
 public class LeiaMicroservice extends MicroService {
     private Attack[] attacks;
+    private int TotalAttacks;
 
     public LeiaMicroservice(Attack[] attacks) {
         super("Leia");
@@ -32,6 +34,7 @@ public class LeiaMicroservice extends MicroService {
 
     @Override
     protected void initialize() throws InterruptedException {
+        setTotalAttacks();
         subscribeBroadcast(TerminationBroadcast.class,(TerminationBroadcast terminationBroadcast) -> {
             terminate();
             Diary diary=Diary.getInstance();
@@ -39,7 +42,6 @@ public class LeiaMicroservice extends MicroService {
             System.out.println("Leia Time:"+System.currentTimeMillis());
         });
         Thread.sleep(10);
-//        register(this);
         List<Future<Boolean>> futureAttackList=new ArrayList<>();
         for (int i = 0; i < attacks.length; i++) {
             AttackEvent attackEvent = new AttackEvent(attacks[i].getDuration(), attacks[i].getSerials());
@@ -56,21 +58,22 @@ public class LeiaMicroservice extends MicroService {
                 moveToDeactivation=true;
             }
         }
-//        for(Future<?> future: futureAttackList){
-//            if(!future.isDone()){
-//                future.get();
-//            }
-//        }
         Future<Boolean> future= sendEvent(new DeactivationEvent());
         if(future.get()){
             sendEvent(new BombDestroyerEvent());
         }
-//        future.get();
-//        BombDestroyerEvent bombDestroyerEvent=new BombDestroyerEvent();
-//        Future<?> future2= sendEvent(bombDestroyerEvent);
-//        future2.get();
-
     }
+    private void setTotalAttacks(){
+        Ewoks ewoks=Ewoks.getInstance();
+        int sum=0;
+        for(int i=0; i<attacks.length; i++){
+            sum=sum+attacks[i].getSerials().size();
+        }
+        ewoks.setTotalAttacks(sum);
+    }
+
+
+
 
 
 }

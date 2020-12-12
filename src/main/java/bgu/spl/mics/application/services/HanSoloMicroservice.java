@@ -24,7 +24,6 @@ public class HanSoloMicroservice extends MicroService {
 
     @Override
     protected void initialize() {
-//        register(this);
         subscribeEvent(AttackEvent.class, (AttackEvent event)->{
             Ewoks ewoks = Ewoks.getInstance();
             ewoks.getResources(event.getSerials());
@@ -33,6 +32,10 @@ public class HanSoloMicroservice extends MicroService {
             Diary diary=Diary.getInstance();
             diary.setHanSoloFinish(System.currentTimeMillis());
             ewoks.releaseResources(event.getSerials());
+            if(ewoks.getCount()==ewoks.getTotalAttacks()){
+                diary.setTotalAttacks(ewoks.getCount());
+                System.out.println("total attacks ->"+ewoks.getCount());
+            }
         });
         subscribeBroadcast(TerminationBroadcast.class,(TerminationBroadcast terminationBroadcast) -> {
             terminate();
