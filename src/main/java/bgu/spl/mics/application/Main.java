@@ -9,6 +9,7 @@ import com.google.gson.GsonBuilder;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,7 +25,7 @@ public class Main {
 		Diary diary=Diary.getInstance();
 		try{
 //			String input=args[0];
-			String input="C:/Studies/Semester3/SPL/Assignment2/src/main/java/bgu/spl/mics/application/Tests.json";
+			String input="C:/Studies/Semester3/SPL/Assignment2/src/main/java/bgu/spl/mics/application/input.json";
 //			String tests="C:/Studies/Semester3/SPL/Assignment2/Tests.json";
 			Input json = JsonInputReader.getInputFromJson(input);
 			Ewoks ewoks=Ewoks.getInstance();
@@ -44,13 +45,26 @@ public class Main {
 			tC3po.start();
 			tR2d2.start();
 			tLando.start();
-		}
-		catch (Exception e){}
-		Gson gson= new GsonBuilder().setPrettyPrinting().create();
-//		String output=args[1];
-//		FileWriter writer=new FileWriter(output);
-//		gson.toJson(diary,writer);
-//		writer.flush();
-//		writer.close();
+			try {
+				tLeia.join();
+				tHanSolo.join();
+				tC3po.join();
+				tR2d2.join();
+				tLando.join();
+			}catch (InterruptedException e){}
+		} catch (IOException e){}
+		String output=("C:/Studies/Semester3/SPL/Assignment2/src/main/java/bgu/spl/mics/application/output.json");
+		Gson gson=new GsonBuilder().setPrettyPrinting().create();
+		FileWriter writer=new FileWriter(output);
+		gson.toJson(diary,writer);
+		writer.flush();
+		writer.close();
+	}
+	public static void outputToJson(String path) throws IOException{
+		Gson gson=new Gson();
+		Writer writer=new FileWriter(path);
+		writer.write(gson.toJson(Diary.getInstance()));
+		writer.flush();
+		writer.close();
 	}
 }

@@ -19,9 +19,9 @@ public class MessageBusImpl implements MessageBus {
     //	private HashMap<String, LinkedBlockingQueue<Message>> HMQueue;
     private ConcurrentHashMap<String, LinkedBlockingQueue<Message>> HMQueue;
     //	private HashMap<Class<? extends Message>, LinkedList<String>> HMType;
-//    private ConcurrentHashMap<Class<? extends Message>, LinkedList<String>> HMType;
-    private ConcurrentHashMap<Class<? extends Message>, LinkedBlockingQueue<String>> HMType;
-    //	private HashMap<Class<? extends Event>, Future> HMFuture;
+    private ConcurrentHashMap<Class<? extends Message>, LinkedList<String>> HMType;
+//    private ConcurrentHashMap<Class<? extends Message>, LinkedBlockingQueue<String>> HMType;
+    //	private HashMap<Class<? extends Event>, Future> HMFuture;ןן
     private ConcurrentHashMap<Event, Future> HMFuture;
 
 
@@ -44,39 +44,39 @@ public class MessageBusImpl implements MessageBus {
 
 
     @Override
-    public <T> void subscribeEvent(Class<? extends Event<T>> type, MicroService m) {
+    public synchronized  <T> void subscribeEvent(Class<? extends Event<T>> type, MicroService m) {
         if (HMType.containsKey(type)) {
-            LinkedBlockingQueue <String> queue=HMType.get(type);
-            queue.add(m.getName());
-//            LinkedList<String> list = HMType.get(type);
-//            list.add(m.getName());
-//            HMType.replace(type,list);
+//            LinkedBlockingQueue <String> queue=HMType.get(type);
+//            queue.add(m.getName());
+            LinkedList<String> list = HMType.get(type);
+            list.add(m.getName());
+            HMType.replace(type,list);
         } else {
             LinkedBlockingQueue<String> queue=new LinkedBlockingQueue<>();
-            queue.add(m.getName());
-            HMType.put(type,queue);
-//            LinkedList<String> list = new LinkedList<>();
-//            list.add(m.getName());
-//            HMType.put(type, list);
+//            queue.add(m.getName());
+//            HMType.put(type,queue);
+            LinkedList<String> list = new LinkedList<>();
+            list.add(m.getName());
+            HMType.put(type, list);
         }
 
     }
 
     @Override
-    public void subscribeBroadcast(Class<? extends Broadcast> type, MicroService m) {
+    public synchronized void subscribeBroadcast(Class<? extends Broadcast> type, MicroService m) {
         if (HMType.containsKey(type)) {
-            LinkedBlockingQueue <String> queue=HMType.get(type);
-            queue.add(m.getName());
-//            LinkedList<String> list = HMType.get(type);
-//            list.add(m.getName());
-//            HMType.replace(type,list);
+//            LinkedBlockingQueue <String> queue=HMType.get(type);
+//            queue.add(m.getName());
+            LinkedList<String> list = HMType.get(type);
+            list.add(m.getName());
+            HMType.replace(type,list);
         } else {
             LinkedBlockingQueue<String> queue=new LinkedBlockingQueue<>();
-            queue.add(m.getName());
-            HMType.put(type,queue);
-//            LinkedList<String> list = new LinkedList<>();
-//            list.add(m.getName());
-//            HMType.put(type, list);
+//            queue.add(m.getName());
+//            HMType.put(type,queue);
+            LinkedList<String> list = new LinkedList<>();
+            list.add(m.getName());
+            HMType.put(type, list);
         }
     }
 
@@ -92,9 +92,9 @@ public class MessageBusImpl implements MessageBus {
             if (HMType.get(b.getClass()).isEmpty()) {
                 throw new NullPointerException("No micros-service has subscribed to " + b.getClass().getName());
             }
-//            LinkedList<String> list = HMType.get(b.getClass());
-            LinkedBlockingQueue<String> queue=HMType.get(b.getClass());
-            for (String s : queue) {
+            LinkedList<String> list = HMType.get(b.getClass());
+//            LinkedBlockingQueue<String> queue=HMType.get(b.getClass());
+            for (String s : list) {
                 if (!HMQueue.containsKey(s)) {
                     throw new NullPointerException("Micro-service " + s + " didn't register");
                 }
@@ -110,25 +110,29 @@ public class MessageBusImpl implements MessageBus {
     @Override
     public synchronized  <T> Future<T> sendEvent(Event<T> e) {
         Future<T> future = new Future<>();
-        if (HMType.containsKey(e.getClass())) {
-            if (HMType.get(e.getClass()).isEmpty()) {
-                throw new NullPointerException("No micros-service has subscribed to " + e.getClass().getName());
-            }
-            LinkedBlockingQueue<String> queue=HMType.get(e.getClass());
-            String temp=queue.poll();
-//            LinkedList<String> list = HMType.get(e.getClass());
-//            String temp = list.get(0);
-//            list.removeFirst();
+        if(!HMType.containsKey(e.getClass())||HMType.get(e.getClass()).isEmpty()){
+            return null;
+        }
+//        if (HMType.containsKey(e.getClass())) {
+//            if (HMType.get(e.getClass()).isEmpty()) {
+//                throw new NullPointerException("No micros-service has subscribed to " + e.getClass().getName());
+//            }
+//            LinkedBlockingQueue<String> queue=HMType.get(e.getClass());
+//            String temp=queue.poll();
+            LinkedList<String> list = HMType.get(e.getClass());
+            String temp = list.get(0);
+            list.removeFirst();
             if (!HMQueue.containsKey(temp)) {
-                throw new NullPointerException("Micro-service " + temp + " didn't register");
+                return null;
+//                throw new NullPointerException("Micro-service " + temp + " didn't register");
             }
             LinkedBlockingQueue<Message> q = HMQueue.get(temp);
             q.add(e);
-            queue.add(temp);
-//            list.addLast(temp);
+//            queue.add(temp);
+            list.addLast(temp);
             HMFuture.put(e, future);
             notifyAll();
-        }
+//        }
         return future;
 
     }

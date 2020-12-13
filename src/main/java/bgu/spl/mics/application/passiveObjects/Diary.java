@@ -16,10 +16,20 @@ public class Diary {
     private long R2D2Deactivate;
     private long LeiaTerminate;
     private long HanSoloTerminate;
-    private long C3PoTerminate;
+    private long C3POTerminate;
     private long R2D2Terminate;
     private long LandoTerminate;
     private AtomicInteger a;
+
+
+    private static class SingletonHolder{
+        private static Diary instance =new Diary();
+    }
+    private Diary(){
+    }
+    public static Diary getInstance(){
+        return SingletonHolder.instance;
+    }
 
     public AtomicInteger getNumberOfAttacks(){
         return a;
@@ -41,7 +51,7 @@ public class Diary {
     }
 
     public long getC3PoTerminate() {
-        return C3PoTerminate;
+        return C3POTerminate;
     }
 
     public long getHanSoloFinish() {
@@ -72,13 +82,6 @@ public class Diary {
         setTotalAttacks(new AtomicInteger(0));
     }
 
-    private static class SingletonHolder{
-        private static Diary instance =new Diary();
-    }
-    private Diary(){}
-    public static Diary getInstance(){
-        return SingletonHolder.instance;
-    }
     public void setR2D2Deactivate(long R2D2Deactivate){
         this.R2D2Deactivate=R2D2Deactivate;
     }
@@ -90,7 +93,7 @@ public class Diary {
     }
 
     public void setC3PoTerminate(long c3PoTerminate) {
-        C3PoTerminate = c3PoTerminate;
+        C3POTerminate = c3PoTerminate;
     }
 
     public void setHanSoloTerminate(long hanSoloTerminate) {

@@ -23,8 +23,10 @@ import java.util.Queue;
 // * You MAY change constructor signatures and even add new public constructors.
 // */
 public class C3POMicroservice extends MicroService {
+    private Diary diary;
     public C3POMicroservice() {
         super("C3PO");
+        diary=Diary.getInstance();
     }
 
 
@@ -35,17 +37,15 @@ public class C3POMicroservice extends MicroService {
             ewoks.getResources(event.getSerials());
             Thread.sleep(event.getDuration());
             complete(event, true);
-            Diary diary=Diary.getInstance();
             diary.setC3POFinish(System.currentTimeMillis());
             ewoks.releaseResources(event.getSerials());
             if(ewoks.getCount()==ewoks.getTotalAttacks()){
                 diary.setTotalAttacks(ewoks.getCount());
-                System.out.println("total attacks ->"+ewoks.getCount());
+//                System.out.println("total attacks ->"+ewoks.getCount());
             }
         });
         subscribeBroadcast(TerminationBroadcast.class,(TerminationBroadcast terminationBroadcast) -> {
             terminate();
-            Diary diary=Diary.getInstance();
             diary.setC3PoTerminate(System.currentTimeMillis());
             System.out.println("C3PO Time:"+System.currentTimeMillis());
         });

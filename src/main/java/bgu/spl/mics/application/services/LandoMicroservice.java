@@ -12,9 +12,12 @@ import bgu.spl.mics.application.passiveObjects.Diary;
  */
 public class LandoMicroservice  extends MicroService {
     private long duration;
+    private Diary diary;
+
     public LandoMicroservice(long duration) {
         super("Lando");
         this.duration = duration;
+        diary=Diary.getInstance();
     }
 
     @Override
@@ -30,7 +33,6 @@ public class LandoMicroservice  extends MicroService {
         });
         subscribeBroadcast(TerminationBroadcast.class,(TerminationBroadcast terminationBroadcast) -> {
             terminate();
-            Diary diary=Diary.getInstance();
             diary.setLandoTerminate(System.currentTimeMillis());
             System.out.println("Lando Time:"+System.currentTimeMillis());
         });

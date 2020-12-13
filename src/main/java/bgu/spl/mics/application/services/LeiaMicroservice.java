@@ -26,10 +26,12 @@ import bgu.spl.mics.application.passiveObjects.Ewoks;
 public class LeiaMicroservice extends MicroService {
     private Attack[] attacks;
     private int TotalAttacks;
+    private Diary diary;
 
     public LeiaMicroservice(Attack[] attacks) {
         super("Leia");
         this.attacks = attacks;
+        diary=Diary.getInstance();
     }
 
     @Override
@@ -37,7 +39,6 @@ public class LeiaMicroservice extends MicroService {
         setTotalAttacks();
         subscribeBroadcast(TerminationBroadcast.class,(TerminationBroadcast terminationBroadcast) -> {
             terminate();
-            Diary diary=Diary.getInstance();
             diary.setLeiaTerminate(System.currentTimeMillis());
             System.out.println("Leia Time:"+System.currentTimeMillis());
         });

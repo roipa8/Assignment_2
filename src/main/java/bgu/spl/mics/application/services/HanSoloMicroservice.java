@@ -16,9 +16,11 @@ import bgu.spl.mics.application.passiveObjects.Ewoks;
 // * You MAY change constructor signatures and even add new public constructors.
 // */
 public class HanSoloMicroservice extends MicroService {
+    private Diary diary;
 
     public HanSoloMicroservice() {
         super("Han");
+        diary=Diary.getInstance();
     }
 
 
@@ -29,17 +31,15 @@ public class HanSoloMicroservice extends MicroService {
             ewoks.getResources(event.getSerials());
             Thread.sleep(event.getDuration());
             complete(event, true);
-            Diary diary=Diary.getInstance();
             diary.setHanSoloFinish(System.currentTimeMillis());
             ewoks.releaseResources(event.getSerials());
             if(ewoks.getCount()==ewoks.getTotalAttacks()){
                 diary.setTotalAttacks(ewoks.getCount());
-                System.out.println("total attacks ->"+ewoks.getCount());
+//                System.out.println("total attacks ->"+ewoks.getCount());
             }
         });
         subscribeBroadcast(TerminationBroadcast.class,(TerminationBroadcast terminationBroadcast) -> {
             terminate();
-            Diary diary=Diary.getInstance();
             diary.setHanSoloTerminate(System.currentTimeMillis());
             System.out.println("Han Solo Time:"+System.currentTimeMillis());
         });

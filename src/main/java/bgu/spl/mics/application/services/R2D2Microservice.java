@@ -15,11 +15,13 @@ import bgu.spl.mics.application.passiveObjects.Diary;
  **/
 public class R2D2Microservice extends MicroService {
     private long duration;
+    private Diary diary;
 
     public R2D2Microservice(long duration)
     {
         super("R2D2");
         this.duration=duration;
+        diary=Diary.getInstance();
     }
 
     @Override
@@ -35,12 +37,10 @@ public class R2D2Microservice extends MicroService {
             }
 
             complete(deactivationEvent, true);
-//            Diary diary=Diary.getInstance();
-//            diary.setR2D2Deactivate(System.currentTimeMillis());
+            diary.setR2D2Deactivate(System.currentTimeMillis());
         });
         subscribeBroadcast(TerminationBroadcast.class,(TerminationBroadcast terminationBroadcast) -> {
             terminate();
-            Diary diary=Diary.getInstance();
             diary.setR2D2Terminate(System.currentTimeMillis());
             System.out.println("R2D2 Time:"+System.currentTimeMillis());
         });
