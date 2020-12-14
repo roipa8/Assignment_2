@@ -25,24 +25,18 @@ public class R2D2Microservice extends MicroService {
     }
 
     @Override
-    protected void initialize() throws InterruptedException {
-//        register(this);
-//        DeactivationEvent deactivationEvent=new DeactivationEvent(duration);
+    protected void initialize(){
         subscribeEvent(DeactivationEvent.class, (DeactivationEvent deactivationEvent)->{
-
             try {
                 Thread.sleep(duration);
             }
-            catch (InterruptedException e){
-            }
-
+            catch (InterruptedException e){}
             complete(deactivationEvent, true);
             diary.setR2D2Deactivate(System.currentTimeMillis());
         });
         subscribeBroadcast(TerminationBroadcast.class,(TerminationBroadcast terminationBroadcast) -> {
             terminate();
             diary.setR2D2Terminate(System.currentTimeMillis());
-            System.out.println("R2D2 Time:"+System.currentTimeMillis());
         });
 
     }

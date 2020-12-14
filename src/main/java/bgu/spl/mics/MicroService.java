@@ -27,8 +27,8 @@ import java.util.HashMap;
  */
 public abstract class MicroService implements Runnable {
     private String name;
-    private HashMap<Class<? extends Message>,Callback> HMMsgCallback;
-    private boolean shouldStop=false;
+    private HashMap<Class<? extends Message>,Callback> HMMsgCallback; //Was made inorder to make a connection between the messages and their callbacks
+    private boolean shouldStop=false; //the condition to stop the message loop
     private MessageBusImpl messageBus;
 
 
@@ -68,7 +68,6 @@ public abstract class MicroService implements Runnable {
      */
     protected final <T, E extends Event<T>> void subscribeEvent(Class<E> type, Callback<E> callback) {
         HMMsgCallback.put(type,callback);
-//    	MessageBusImpl bus=MessageBusImpl.getInstance();
     	messageBus.subscribeEvent(type,this);
     }
 
@@ -94,7 +93,6 @@ public abstract class MicroService implements Runnable {
      */
     protected final <B extends Broadcast> void subscribeBroadcast(Class<B> type, Callback<B> callback) {
         HMMsgCallback.put(type,callback);
-//    	MessageBusImpl bus=MessageBusImpl.getInstance();
     	messageBus.subscribeBroadcast(type,this);
     }
 
@@ -111,7 +109,6 @@ public abstract class MicroService implements Runnable {
      * 	       			null in case no micro-service has subscribed to {@code e.getClass()}.
      */
     protected final <T> Future<T> sendEvent(Event<T> e) {
-//        return MessageBusImpl.getInstance().sendEvent(e);
         return messageBus.sendEvent(e);
     }
 
@@ -122,7 +119,6 @@ public abstract class MicroService implements Runnable {
      * @param b The broadcast message to send
      */
     protected final void sendBroadcast(Broadcast b) {
-//        MessageBusImpl bus=MessageBusImpl.getInstance();
         messageBus.sendBroadcast(b);
     }
 
@@ -138,7 +134,6 @@ public abstract class MicroService implements Runnable {
      *               {@code e}.
      */
     protected final <T> void complete(Event<T> e, T result) {
-//    	MessageBusImpl bus=MessageBusImpl.getInstance();
     	messageBus.complete(e,result);
     }
 
@@ -153,7 +148,7 @@ public abstract class MicroService implements Runnable {
      */
     protected final void terminate() {
     	messageBus.unregister(this);
-        shouldStop=true;
+        shouldStop=true; //stop the run of the derived micro-service
     }
 
     /**
@@ -170,20 +165,17 @@ public abstract class MicroService implements Runnable {
      */
     @Override
     public final void run() {
-//        MessageBusImpl messageBus=MessageBusImpl.getInstance();
+        //the initialize part
         messageBus.register(this);
         try {
             initialize();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        //End of the initialize part and the start of the message loop
         Message msg =null;
         while(!shouldStop){
-            try {
-                msg=messageBus.awaitMessage(this);
-            } catch (InterruptedException e) {
-//                e.printStackTrace();
-            }
+            msg=messageBus.awaitMessage(this);
             if(msg!=null){
                 if(HMMsgCallback.containsKey(msg.getClass())){
                     Callback c=HMMsgCallback.get(msg.getClass());
@@ -195,12 +187,8 @@ public abstract class MicroService implements Runnable {
                 }
             }
         }
-//        messageBus.unregister(this);
+        //The end of the message loop
     }
-//    protected void register(MicroService m) {
-//        MessageBusImpl bus=MessageBusImpl.getInstance();
-//        bus.register(m);
-//    }
 
 
 }

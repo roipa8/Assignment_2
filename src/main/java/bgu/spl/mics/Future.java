@@ -67,22 +67,16 @@ public class Future<T> {
      * 	       wait for {@code timeout} TimeUnits {@code unit}. If time has
      *         elapsed, return null.
      */
-	public T get(long timeout, TimeUnit unit) throws InterruptedException {
+	public T get(long timeout, TimeUnit unit){
 		if(!isDone){
-			Thread.sleep(timeout);
+			try{
+				unit.sleep(timeout);
+			} catch (InterruptedException e){}
 		}
 		if(isDone){
 			return result;
 		}
 		return null;
-//		try{
-//			while(!isDone){
-//				this.wait(timeout);
-//			}
-//		} catch (InterruptedException e) {
-//			notifyAll();
-//		}
-//		return result;
 	}
 
 }

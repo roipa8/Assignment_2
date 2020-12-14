@@ -53,17 +53,11 @@ public class Main {
 				tLando.join();
 			}catch (InterruptedException e){}
 		} catch (IOException e){}
+//		String output = args[1];
 		String output=("C:/Studies/Semester3/SPL/Assignment2/src/main/java/bgu/spl/mics/application/output.json");
 		Gson gson=new GsonBuilder().setPrettyPrinting().create();
 		FileWriter writer=new FileWriter(output);
 		gson.toJson(diary,writer);
-		writer.flush();
-		writer.close();
-	}
-	public static void outputToJson(String path) throws IOException{
-		Gson gson=new Gson();
-		Writer writer=new FileWriter(path);
-		writer.write(gson.toJson(Diary.getInstance()));
 		writer.flush();
 		writer.close();
 	}

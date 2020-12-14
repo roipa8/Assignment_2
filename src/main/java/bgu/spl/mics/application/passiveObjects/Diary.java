@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Do not add to this class nothing but a single constructor, getters and setters.
  */
 public class Diary {
-    private int totalAttacks;
+    private AtomicInteger totalAttacks;
     private long HanSoloFinish;
     private long C3POFinish;
     private long R2D2Deactivate;
@@ -19,32 +19,33 @@ public class Diary {
     private long C3POTerminate;
     private long R2D2Terminate;
     private long LandoTerminate;
-    private AtomicInteger a;
 
+    /////////////////////
+    //We made it a thread-safe singleton in order that the data that the diary will get will be accurate
+    private static class SingletonHolder {
+        private static Diary instance = new Diary();
+    }
 
-    private static class SingletonHolder{
-        private static Diary instance =new Diary();
+    private Diary() {
+        totalAttacks = new AtomicInteger();
     }
-    private Diary(){
-    }
-    public static Diary getInstance(){
+
+    public static Diary getInstance() {
         return SingletonHolder.instance;
     }
 
-    public AtomicInteger getNumberOfAttacks(){
-        return a;
-    }
-    private void setTotalAttacks(AtomicInteger a){
-        this.a=a;
-    }
-
-    public int getTotalAttacks() {
+    public AtomicInteger getNumberOfAttacks() {
         return totalAttacks;
     }
 
-    public void setTotalAttacks(int totalAttacks) {
+    public void setTotalAttacks(AtomicInteger totalAttacks) {
         this.totalAttacks = totalAttacks;
     }
+
+    public int getTotalAttacks() {
+        return totalAttacks.get();
+    }
+
 
     public long getC3POFinish() {
         return C3POFinish;
@@ -79,15 +80,17 @@ public class Diary {
     }
 
     public void resetNumberAttacks() {
-        setTotalAttacks(new AtomicInteger(0));
+        totalAttacks.getAndSet(0);
     }
 
-    public void setR2D2Deactivate(long R2D2Deactivate){
-        this.R2D2Deactivate=R2D2Deactivate;
+    public void setR2D2Deactivate(long R2D2Deactivate) {
+        this.R2D2Deactivate = R2D2Deactivate;
     }
+
     public void setC3POFinish(long c3POFinish) {
         C3POFinish = c3POFinish;
     }
+
     public void setHanSoloFinish(long hanSoloFinish) {
         HanSoloFinish = hanSoloFinish;
     }

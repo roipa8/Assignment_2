@@ -2,6 +2,7 @@ package bgu.spl.mics.application.services;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import bgu.spl.mics.Event;
 import bgu.spl.mics.Future;
@@ -25,53 +26,48 @@ import bgu.spl.mics.application.passiveObjects.Ewoks;
  */
 public class LeiaMicroservice extends MicroService {
     private Attack[] attacks;
-    private int TotalAttacks;
     private Diary diary;
+    private ArrayList<Future<Boolean>> futureAttackList;
+    private AtomicInteger numOfResolvedFutures;
 
     public LeiaMicroservice(Attack[] attacks) {
         super("Leia");
         this.attacks = attacks;
         diary=Diary.getInstance();
+        futureAttackList=new ArrayList<>();
+        numOfResolvedFutures=new AtomicInteger(0);
     }
 
     @Override
-    protected void initialize() throws InterruptedException {
-        setTotalAttacks();
+    protected void initialize() {
         subscribeBroadcast(TerminationBroadcast.class,(TerminationBroadcast terminationBroadcast) -> {
             terminate();
             diary.setLeiaTerminate(System.currentTimeMillis());
-            System.out.println("Leia Time:"+System.currentTimeMillis());
         });
-        Thread.sleep(10);
-        List<Future<Boolean>> futureAttackList=new ArrayList<>();
+        try {
+            Thread.sleep(10); //To make sure that the other threads already registered and subscribed to their events
+        } catch (InterruptedException e){}
         for (int i = 0; i < attacks.length; i++) {
             AttackEvent attackEvent = new AttackEvent(attacks[i].getDuration(), attacks[i].getSerials());
             Future <Boolean> future = sendEvent(attackEvent);
             futureAttackList.add(future);
         }
-        int numOfResolvedFutures=0;
         boolean moveToDeactivation=false;
+        //Checking if all the future attacks resolved
         while (!moveToDeactivation){
-            if(futureAttackList.get(numOfResolvedFutures).get()){
-                numOfResolvedFutures=numOfResolvedFutures+1;
+            if(futureAttackList.get(numOfResolvedFutures.intValue()).get()){
+                numOfResolvedFutures.incrementAndGet();
             }
-            if(numOfResolvedFutures==futureAttackList.size()){
+            if(numOfResolvedFutures.intValue()==futureAttackList.size()){
                 moveToDeactivation=true;
             }
         }
-        Future<Boolean> future= sendEvent(new DeactivationEvent());
-        if(future.get()){
+        Future<Boolean> Deactivationfuture= sendEvent(new DeactivationEvent());
+        if(Deactivationfuture.get()){
             sendEvent(new BombDestroyerEvent());
         }
     }
-    private void setTotalAttacks(){
-        Ewoks ewoks=Ewoks.getInstance();
-        int sum=0;
-        for(int i=0; i<attacks.length; i++){
-            sum=sum+attacks[i].getSerials().size();
-        }
-        ewoks.setTotalAttacks(sum);
-    }
+
 
 
 

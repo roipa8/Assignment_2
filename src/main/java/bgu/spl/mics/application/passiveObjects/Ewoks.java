@@ -16,39 +16,40 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Ewoks {
     private Ewok[] EwoksArr;
-    private AtomicInteger count;
-    private int TotalAttacks;
-    private static Ewoks instance = null;
+    private AtomicInteger countOfTotalAttacks; // count the total numbers of attacks for the diary
+
+
+    /////////////////////
+    //We made it a thread-safe singleton in order that the number of ewoks and attacks in general will be accurate
     private static class SingletonHolder{
         private static Ewoks instance =new Ewoks();
     }
     private Ewoks(){
-        count=new AtomicInteger();
+        countOfTotalAttacks=new AtomicInteger();
     }
+    public static Ewoks getInstance(){
+        return SingletonHolder.instance;
+    }
+    /////////////////////
+
     public void initialize(int ewoksSize){
         EwoksArr=new Ewok[ewoksSize];
         for(int i=0; i<ewoksSize; i++){
             EwoksArr[i]=new Ewok(i+1,true);
         }
     }
-    public Ewok[] getEwoksArr(){
-        return EwoksArr;
-    }
 
 
-//    public synchronized void getResources(List<Integer> list){
-//
-//    }
     public void getResources(List<Integer> list) throws InterruptedException {
-        Collections.sort(list);
+        Collections.sort(list); //Sort the list in order to avoid deadlocks
         for(int i = 0;i<list.size();i++){
             EwoksArr[list.get(i)-1].acquire();
-            count.incrementAndGet();
         }
+        countOfTotalAttacks.incrementAndGet();
     }
 
-    public int getCount(){
-        return count.get();
+    public AtomicInteger getCountofTotalAttacks(){ // return the total number of attacks for the diary
+        return countOfTotalAttacks;
     }
 
     public void releaseResources(List<Integer> list){
@@ -58,22 +59,6 @@ public class Ewoks {
 
     }
 
-    public int getTotalAttacks() {
-        return TotalAttacks;
-    }
 
-    public void setTotalAttacks(int totalAttacks) {
-        TotalAttacks = totalAttacks;
-    }
-
-    //    public boolean isAvailable(Ewok ewok){
-//        return ewok.available;
-//    }
-//    public int getSerialNumber(Ewok ewok){
-//        return ewok.serialNumber;
-//    }
-    public static Ewoks getInstance(){
-        return SingletonHolder.instance;
-    }
 
 }

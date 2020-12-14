@@ -18,11 +18,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class MessageBusImpl implements MessageBus {
     //	private HashMap<String, LinkedBlockingQueue<Message>> HMQueue;
     private ConcurrentHashMap<String, LinkedBlockingQueue<Message>> HMQueue;
-    //	private HashMap<Class<? extends Message>, LinkedList<String>> HMType;
-    private ConcurrentHashMap<Class<? extends Message>, LinkedList<String>> HMType;
+    	private HashMap<Class<? extends Message>, LinkedList<String>> HMType;
+//    private ConcurrentHashMap<Class<? extends Message>, LinkedList<String>> HMType;
 //    private ConcurrentHashMap<Class<? extends Message>, LinkedBlockingQueue<String>> HMType;
     //	private HashMap<Class<? extends Event>, Future> HMFuture;ןן
-    private ConcurrentHashMap<Event, Future> HMFuture;
+    private HashMap<Event, Future> HMFuture;
 
 
     private static class SingletonHolder {
@@ -31,11 +31,11 @@ public class MessageBusImpl implements MessageBus {
 
     private MessageBusImpl() {
 //		HMQueue=new HashMap<>();
-//		HMType=new HashMap<>();
-//		HMFuture=new HashMap<>();
+		HMType=new HashMap<>();
+		HMFuture=new HashMap<>();
         HMQueue = new ConcurrentHashMap<>();
-        HMType = new ConcurrentHashMap<>();
-        HMFuture = new ConcurrentHashMap<>();
+//        HMType = new ConcurrentHashMap<>();
+//        HMFuture = new ConcurrentHashMap<>();
     }
 
     public static MessageBusImpl getInstance() {
@@ -44,17 +44,13 @@ public class MessageBusImpl implements MessageBus {
 
 
     @Override
-    public synchronized  <T> void subscribeEvent(Class<? extends Event<T>> type, MicroService m) {
+    public synchronized <T> void subscribeEvent(Class<? extends Event<T>> type, MicroService m) {
         if (HMType.containsKey(type)) {
-//            LinkedBlockingQueue <String> queue=HMType.get(type);
-//            queue.add(m.getName());
             LinkedList<String> list = HMType.get(type);
-            list.add(m.getName());
-            HMType.replace(type,list);
+            if(!list.contains(m.getName())){
+                list.add(m.getName());
+            }
         } else {
-            LinkedBlockingQueue<String> queue=new LinkedBlockingQueue<>();
-//            queue.add(m.getName());
-//            HMType.put(type,queue);
             LinkedList<String> list = new LinkedList<>();
             list.add(m.getName());
             HMType.put(type, list);
@@ -65,15 +61,11 @@ public class MessageBusImpl implements MessageBus {
     @Override
     public synchronized void subscribeBroadcast(Class<? extends Broadcast> type, MicroService m) {
         if (HMType.containsKey(type)) {
-//            LinkedBlockingQueue <String> queue=HMType.get(type);
-//            queue.add(m.getName());
             LinkedList<String> list = HMType.get(type);
-            list.add(m.getName());
-            HMType.replace(type,list);
+            if(!list.contains(m.getName())){
+                list.add(m.getName());
+            }
         } else {
-            LinkedBlockingQueue<String> queue=new LinkedBlockingQueue<>();
-//            queue.add(m.getName());
-//            HMType.put(type,queue);
             LinkedList<String> list = new LinkedList<>();
             list.add(m.getName());
             HMType.put(type, list);
@@ -93,8 +85,8 @@ public class MessageBusImpl implements MessageBus {
                 throw new NullPointerException("No micros-service has subscribed to " + b.getClass().getName());
             }
             LinkedList<String> list = HMType.get(b.getClass());
-//            LinkedBlockingQueue<String> queue=HMType.get(b.getClass());
             for (String s : list) {
+//                HMQueue.putIfAbsent(s,new LinkedBlockingQueue<>());
                 if (!HMQueue.containsKey(s)) {
                     throw new NullPointerException("Micro-service " + s + " didn't register");
                 }
@@ -113,26 +105,18 @@ public class MessageBusImpl implements MessageBus {
         if(!HMType.containsKey(e.getClass())||HMType.get(e.getClass()).isEmpty()){
             return null;
         }
-//        if (HMType.containsKey(e.getClass())) {
-//            if (HMType.get(e.getClass()).isEmpty()) {
-//                throw new NullPointerException("No micros-service has subscribed to " + e.getClass().getName());
-//            }
-//            LinkedBlockingQueue<String> queue=HMType.get(e.getClass());
-//            String temp=queue.poll();
             LinkedList<String> list = HMType.get(e.getClass());
             String temp = list.get(0);
             list.removeFirst();
             if (!HMQueue.containsKey(temp)) {
                 return null;
-//                throw new NullPointerException("Micro-service " + temp + " didn't register");
             }
             LinkedBlockingQueue<Message> q = HMQueue.get(temp);
             q.add(e);
-//            queue.add(temp);
+
             list.addLast(temp);
             HMFuture.put(e, future);
             notifyAll();
-//        }
         return future;
 
     }
@@ -149,7 +133,7 @@ public class MessageBusImpl implements MessageBus {
     }
 
     @Override
-    public synchronized Message awaitMessage(MicroService m) throws InterruptedException {
+    public synchronized Message awaitMessage(MicroService m) {
         Message msg = null;
         if (HMQueue.containsKey(m.getName())) {
             LinkedBlockingQueue<Message> q = HMQueue.get(m.getName());

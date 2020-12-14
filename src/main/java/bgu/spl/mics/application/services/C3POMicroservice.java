@@ -31,23 +31,20 @@ public class C3POMicroservice extends MicroService {
 
 
     @Override
-    protected void initialize() throws InterruptedException {
+    protected void initialize(){
         subscribeEvent(AttackEvent.class, (AttackEvent event) -> {
             Ewoks ewoks = Ewoks.getInstance();
             ewoks.getResources(event.getSerials());
-            Thread.sleep(event.getDuration());
+            try {
+                Thread.sleep(event.getDuration());
+            } catch (InterruptedException e){}
             complete(event, true);
             diary.setC3POFinish(System.currentTimeMillis());
             ewoks.releaseResources(event.getSerials());
-            if(ewoks.getCount()==ewoks.getTotalAttacks()){
-                diary.setTotalAttacks(ewoks.getCount());
-//                System.out.println("total attacks ->"+ewoks.getCount());
-            }
         });
         subscribeBroadcast(TerminationBroadcast.class,(TerminationBroadcast terminationBroadcast) -> {
             terminate();
             diary.setC3PoTerminate(System.currentTimeMillis());
-            System.out.println("C3PO Time:"+System.currentTimeMillis());
         });
     }
 }

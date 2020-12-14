@@ -7,7 +7,7 @@ package bgu.spl.mics.application.passiveObjects;
  * You may add fields and methods to this class as you see fit (including public methods).
  */
 public class Ewok {
-    int serialNumber;
+    private int serialNumber;
     boolean available;
 
     public Ewok(int serialNumber, boolean available){
@@ -17,7 +17,7 @@ public class Ewok {
     /**
      * Acquires an Ewok
      */
-    public synchronized void acquire() throws InterruptedException {
+    public synchronized void acquire(){
         while (!isAvailable()){
             try{
                 wait();

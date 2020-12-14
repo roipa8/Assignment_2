@@ -34,7 +34,6 @@ public class LandoMicroservice  extends MicroService {
         subscribeBroadcast(TerminationBroadcast.class,(TerminationBroadcast terminationBroadcast) -> {
             terminate();
             diary.setLandoTerminate(System.currentTimeMillis());
-            System.out.println("Lando Time:"+System.currentTimeMillis());
         });
 
     }
